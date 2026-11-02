@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qyxev</title>
+  
+  <!-- Hooded Q SVG Favicon (No Outline / Solid Fill) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 8 C25 8 18 35 18 55 C18 72 28 85 38 90 C42 85 45 72 45 60 C35 58 32 48 38 40 C42 35 58 35 62 40 C68 48 65 58 55 60 C55 72 58 85 62 90 C72 85 82 72 82 55 C82 35 75 8 50 8 Z' fill='%23ffffff'/><text x='50' y='50' font-family='Montserrat, sans-serif' font-weight='900' font-size='22' fill='%23000000' text-anchor='middle' dominant-baseline='central'>Q</text></svg>" />
+
+  <!-- Google Fonts: Montserrat Bold & All Weights -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700;1,900&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* CSS Variables & Theme Engine */
+    :root {
+      --bg-base: #000000;
+      --bg-gradient: radial-gradient(circle at 50% 0%, #111111 0%, #000000 100%);
+      --text-main: #ffffff;
+      --text-muted: #888888;
+      --text-subtle: #555555;
+      
+      /* Glassmorphism Tokens */
+      --glass-bg: rgba(18, 18, 18, 0.55);
+      --glass-bg-hover: rgba(30, 30, 30, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-border-hover: rgba(255, 255, 255, 0.2);
+      --glass-blur: blur(16px);
+      --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+
+      --badge-bg: rgba(255, 255, 255, 0.06);
+      --badge-border: rgba(255, 255, 255, 0.12);
+      --accent-solid: #ffffff;
+      --accent-text: #000000;
+
+      --table-header-bg: rgba(255, 255, 255, 0.03);
+      --table-row-hover: rgba(255, 255, 255, 0.04);
+      --logo-fill: #ffffff;
+      --logo-q-fill: #000000;
+    }
+
+    [data-theme="light"] {
+      --bg-base: #f4f5f7;
+      --bg-gradient: radial-gradient(circle at 50% 0%, #ffffff 0%, #e4e7eb 100%);
+      --text-main: #000000;
+      --text-muted: #555555;
+      --text-subtle: #888888;
+      
+      /* Light Glassmorphism Tokens */
+      --glass-bg: rgba(255, 255, 255, 0.65);
+      --glass-bg-hover: rgba(255, 255, 255, 0.85);
+      --glass-border: rgba(0, 0, 0, 0.08);
+      --glass-border-hover: rgba(0, 0, 0, 0.25);
+      --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+
+      --badge-bg: rgba(0, 0, 0, 0.05);
+      --badge-border: rgba(0, 0, 0, 0.1);
+      --accent-solid: #000000;
+      --accent-text: #ffffff;
+
+      --table-header-bg: rgba(0, 0, 0, 0.03);
+      --table-row-hover: rgba(0, 0, 0, 0.03);
+      --logo-fill: #000000;
+      --logo-q-fill: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Montserrat', sans-serif !important;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      background-image: var(--bg-gradient);
+      color: var(--text-main);
+      line-height: 1.5;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+      transition: background 0.4s ease, color 0.4s ease;
+    }
+
+    /* Ambient Background Canvas */
+    #bg-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.6;
+    }
+
+    .app-wrapper {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      width: 100%;
+    }
+
+    /* Glass Panels Universal Style */
+    .glass-panel {
+      background: var(--glass-bg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      box-shadow: var(--glass-shadow);
+      transition: all 0.3s ease;
+    }
+
+    /* Navigation Bar */
+    .navbar {
+      position: sticky;
+      top: 1rem;
+      z-index: 100;
+      margin-top: 1rem;
+      padding: 0.75rem 1.25rem;
+    }
+
+    .nav-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    /* Solid Hooded Q Logo Styling */
+    .hooded-q-logo {
+      display: inline-block;
+      vertical-align: middle;
+      transition: transform 0.2s ease;
+    }
+
+    .hooded-q-logo:hover {
+      transform: scale(1.05);
+    }
+
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-transform: lowercase;
+      color: var(--text-main);
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .control-select, .icon-btn {
+      background: var(--badge-bg);
+      border: 1px solid var(--glass-border);
+      color: var(--text-main);
+      padding: 0.45rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+
+    .control-select:hover, .icon-btn:hover {
+      background: var(--glass-bg-hover);
+      border-color: var(--glass-border-hover);
+    }
+
+    .control-select option {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 4rem 0 2rem;
+      text-align: center;
+    }
+
+    .hero-avatar {
+      margin: 0 auto 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-title {
+      font-size: 3.25rem;
+      font-weight: 900;
+      letter-spacing: 4px;
+      text-transform: lowercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-subtitle {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      font-weight: 600;
+      max-width: 600px;
+      margin: 0 auto 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Search & Filter Glass Bar */
+    .filter-container {
+      margin-bottom: 1.5rem;
+      padding: 1rem 1.25rem;
+    }
+
+    .filter-controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 240px;
+    }
+
+    .search-box i {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      width: 16px;
+      height: 16px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--badge-bg);
+      border: 1px solid var(--glass-border);
+      color: var(--text-main);
+      padding: 0.55rem 0.85rem 0.55rem 2.5rem;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--glass-border-hover);
+      background: var(--glass-bg-hover);
+    }
+
+    .category-tabs {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: var(--badge-bg);
+      border: 1px solid var(--glass-border);
+      color: var(--text-muted);
+      padding: 0.5rem 0.85rem;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover, .tab-btn.active {
+      color: var(--text-main);
+      background: var(--glass-bg-hover);
+      border-color: var(--glass-border-hover);
+    }
+
+    /* Table Glass Layout */
+    .table-container {
+      overflow-x: auto;
+      border-radius: 12px;
+      margin-bottom: 2.5rem;
+    }
+
+    .releases-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .releases-table th {
+      background: var(--table-header-bg);
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .releases-table td {
+      padding: 1.1rem 1.25rem;
+      border-bottom: 1px solid var(--glass-border);
+      vertical-align: middle;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .releases-table tbody tr {
+      transition: background 0.2s ease;
+    }
+
+    .releases-table tbody tr:hover {
+      background: var(--table-row-hover);
+    }
+
+    .app-title-cell {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .app-name {
+      color: var(--text-main);
+      font-size: 0.95rem;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .version-tag {
+      font-size: 0.65rem;
+      background: var(--badge-bg);
+      border: 1px solid var(--badge-border);
+      color: var(--text-muted);
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      font-weight: 800;
+    }
+
+    .tech-badges {
+      display: flex;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      font-size: 0.65rem;
+      background: var(--badge-bg);
+      border: 1px solid var(--badge-border);
+      color: var(--text-main);
+      padding: 0.2rem 0.45rem;
+      border-radius: 4px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .action-group {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn {
+      text-decoration: none;
+      font-size: 0.75rem;
+      font-weight: 900;
+      padding: 0.45rem 0.85rem;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+
+    .btn-primary {
+      background: var(--accent-solid);
+      color: var(--accent-text);
+      border-color: var(--accent-solid);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--badge-bg);
+      color: var(--text-main);
+      border-color: var(--glass-border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--glass-bg-hover);
+      border-color: var(--glass-border-hover);
+    }
+
+    /* Modal Glass Styling */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      width: 90%;
+      max-width: 480px;
+      padding: 2rem;
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.25rem;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .modal-close:hover {
+      color: var(--text-main);
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 8px;
+      background: var(--badge-bg);
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 1.5rem 0 0.5rem;
+      border: 1px solid var(--glass-border);
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent-solid);
+      transition: width 0.1s linear;
+    }
+
+    footer {
+      margin-top: auto;
+      padding: 2rem 0;
+      border-top: 1px solid var(--glass-border);
+      text-align: center;
+      color: var(--text-subtle);
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Canvas Background -->
+  <canvas id="bg-canvas"></canvas>
+
+  <div class="app-wrapper">
+    <!-- Navigation Bar -->
+    <header class="container">
+      <nav class="navbar glass-panel">
+        <div class="nav-content">
+          <div class="brand-group">
+            <!-- Solid Hooded Q Logo SVG -->
+            <svg class="hooded-q-logo" width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M50 8 C25 8 18 35 18 55 C18 72 28 85 38 90 C42 85 45 72 45 60 C35 58 32 48 38 40 C42 35 58 35 62 40 C68 48 65 58 55 60 C55 72 58 85 62 90 C72 85 82 72 82 55 C82 35 75 8 50 8 Z" fill="var(--logo-fill)"/>
+              <text x="50" y="50" font-family="Montserrat, sans-serif" font-weight="900" font-size="22" fill="var(--logo-q-fill)" text-anchor="middle" dominant-baseline="central">Q</text>
+            </svg>
+            <span class="brand-title">qyxev</span>
+          </div>
+
+          <div class="nav-controls">
+            <!-- Background Canvas Mode Selector -->
+            <select id="bg-anim-select" class="control-select" aria-label="Background Animation">
+              <option value="nodes">FX: Nodes</option>
+              <option value="matrix">FX: Rain</option>
+              <option value="grid">FX: Grid</option>
+              <option value="off">FX: Off</option>
+            </select>
+
+            <!-- Light / Dark Theme Toggle Button -->
+            <button id="theme-toggle" class="icon-btn" aria-label="Toggle Theme">
+              <i data-lucide="sun" class="sun-icon"></i>
+              <i data-lucide="moon" class="moon-icon" style="display:none;"></i>
+            </button>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+      <!-- Hero Header Section -->
+      <section class="hero">
+        <div class="hero-avatar">
+          <svg class="hooded-q-logo" width="72" height="72" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M50 8 C25 8 18 35 18 55 C18 72 28 85 38 90 C42 85 45 72 45 60 C35 58 32 48 38 40 C42 35 58 35 62 40 C68 48 65 58 55 60 C55 72 58 85 62 90 C72 85 82 72 82 55 C82 35 75 8 50 8 Z" fill="var(--logo-fill)"/>
+            <text x="50" y="50" font-family="Montserrat, sans-serif" font-weight="900" font-size="22" fill="var(--logo-q-fill)" text-anchor="middle" dominant-baseline="central">Q</text>
+          </svg>
+        </div>
+        <h1 class="hero-title">qyxev</h1>
+        <p class="hero-subtitle">Software Releases & System Utilities</p>
+      </section>
+
+      <!-- Search & Category Filters -->
+      <section class="filter-container glass-panel">
+        <div class="filter-controls">
+          <div class="search-box">
+            <i data-lucide="search"></i>
+            <input type="text" id="search-input" class="search-input" placeholder="Search software or tags..." />
+          </div>
+
+          <div class="category-tabs">
+            <button class="tab-btn active" data-filter="all">All</button>
+            <button class="tab-btn" data-filter="desktop">Desktop</button>
+            <button class="tab-btn" data-filter="cli">CLI / Backend</button>
+            <button class="tab-btn" data-filter="web">Web Tools</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Glass Table Releases Container -->
+      <section class="table-container glass-panel">
+        <table class="releases-table">
+          <thead>
+            <tr>
+              <th>Application</th>
+              <th>Category</th>
+              <th>Stack</th>
+              <th>Description</th>
+              <th style="text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="releases-tbody">
+
+            <!-- Real Release 1: Global Media Sourcing -->
+            <tr class="release-row" data-category="cli">
+              <td>
+                <div class="app-title-cell">
+                  <i data-lucide="terminal" style="width: 18px; height: 18px; color: var(--text-muted);"></i>
+                  <a href="#" class="app-name">Global Media Sourcing</a>
+                  <span class="version-tag">v1.2.0</span>
+                </div>
+              </td>
+              <td style="text-transform: uppercase; color: var(--text-muted); font-size: 0.75rem;">CLI / Backend</td>
+              <td>
+                <div class="tech-badges">
+                  <span class="badge">Python</span>
+                  <span class="badge">Automation</span>
+                </div>
+              </td>
+              <td style="color: var(--text-muted); font-size: 0.8rem;">
+                Automated media discovery microservice for crawling, querying, and ingesting video content with metadata cleanup.
+              </td>
+              <td>
+                <div class="action-group" style="justify-content: flex-end;">
+                  <button class="btn btn-primary download-trigger" data-title="Global Media Sourcing" data-file="gms-v1.2.0.zip">
+                    <i data-lucide="download" style="width: 14px; height: 14px;"></i> Get
+                  </button>
+                  <a href="https://github.com/qyxev/gms" target="_blank" rel="noopener" class="btn btn-secondary">
+                    <i data-lucide="github" style="width: 14px; height: 14px;"></i> Code
+                  </a>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Real Release 2: Lumina Translate -->
+            <tr class="release-row" data-category="desktop">
+              <td>
+                <div class="app-title-cell">
+                  <i data-lucide="monitor" style="width: 18px; height: 18px; color: var(--text-muted);"></i>
+                  <a href="#" class="app-name">Lumina Translate</a>
+                  <span class="version-tag">v2.0.1</span>
+                </div>
+              </td>
+              <td style="text-transform: uppercase; color: var(--text-muted); font-size: 0.75rem;">Desktop App</td>
+              <td>
+                <div class="tech-badges">
+                  <span class="badge">Python</span>
+                  <span class="badge">PyTesseract</span>
+                  <span class="badge">MSS</span>
+                </div>
+              </td>
+              <td style="color: var(--text-muted); font-size: 0.8rem;">
+                Real-time on-screen OCR translation overlay application with desktop screen capture integration.
+              </td>
+              <td>
+                <div class="action-group" style="justify-content: flex-end;">
+                  <button class="btn btn-primary download-trigger" data-title="Lumina Translate" data-file="lumina-translate-v2.0.1.exe">
+                    <i data-lucide="download" style="width: 14px; height: 14px;"></i> Get
+                  </button>
+                  <a href="https://github.com/qyxev" target="_blank" rel="noopener" class="btn btn-secondary">
+                    <i data-lucide="github" style="width: 14px; height: 14px;"></i> Code
+                  </a>
+                </div>
+              </td>
+            </tr>
+
+            <!-- TEMPLATE FOR FUTURE RELEASES (Uncomment to add new entries)
+            <tr class="release-row" data-category="desktop|cli|web">
+              <td>
+                <div class="app-title-cell">
+                  <i data-lucide="box" style="width: 18px; height: 18px; color: var(--text-muted);"></i>
+                  <a href="#" class="app-name">Project Name</a>
+                  <span class="version-tag">v1.0.0</span>
+                </div>
+              </td>
+              <td style="text-transform: uppercase; color: var(--text-muted); font-size: 0.75rem;">Category</td>
+              <td>
+                <div class="tech-badges">
+                  <span class="badge">Tag1</span>
+                  <span class="badge">Tag2</span>
+                </div>
+              </td>
+              <td style="color: var(--text-muted); font-size: 0.8rem;">
+                Brief description of your tool or application.
+              </td>
+              <td>
+                <div class="action-group" style="justify-content: flex-end;">
+                  <button class="btn btn-primary download-trigger" data-title="Project Name" data-file="filename.zip">
+                    <i data-lucide="download" style="width: 14px; height: 14px;"></i> Get
+                  </button>
+                  <a href="#" target="_blank" class="btn btn-secondary">
+                    <i data-lucide="github" style="width: 14px; height: 14px;"></i> Code
+                  </a>
+                </div>
+              </td>
+            </tr>
+            -->
+
+          </tbody>
+        </table>
+
+        <!-- Empty state message for searches -->
+        <div id="empty-state" class="empty-state" style="display: none;">
+          <i data-lucide="package-open" style="width: 32px; height: 32px; margin-bottom: 0.5rem; stroke-width: 1.5;"></i>
+          <p style="font-weight: 800; font-size: 0.9rem;">No matching software releases found.</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <p>© 2026 qyxev • Hosted on GitHub Pages</p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Download Glass Modal -->
+  <div id="download-modal" class="modal-overlay">
+    <div class="modal-card glass-panel">
+      <button id="modal-close" class="modal-close">
+        <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+      </button>
+      <div style="text-align: center;">
+        <i data-lucide="download" style="width: 36px; height: 36px; margin-bottom: 0.75rem;"></i>
+        <h3 id="modal-title" style="font-size: 1.2rem; font-weight: 900; margin-bottom: 0.25rem;">Preparing File...</h3>
+        <p id="modal-filename" style="color: var(--text-muted); font-size: 0.75rem; font-weight: 800; font-family: monospace;"></p>
+        
+        <div class="progress-bar-bg">
+          <div id="progress-bar" class="progress-bar-fill"></div>
+        </div>
+        <p id="progress-status" style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); margin-top: 0.5rem;">Connecting...</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Theme Switcher Logic
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const sunIcon = themeToggleBtn.querySelector('.sun-icon');
+    const moonIcon = themeToggleBtn.querySelector('.moon-icon');
+    const htmlEl = document.documentElement;
+
+    themeToggleBtn.addEventListener('click', () => {
+      const currentTheme = htmlEl.getAttribute('data-theme');
+      const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      htmlEl.setAttribute('data-theme', nextTheme);
+
+      if (nextTheme === 'light') {
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'block';
+      } else {
+        sunIcon.style.display = 'block';
+        moonIcon.style.display = 'none';
+      }
+    });
+
+    // Real-Time Search & Category Filtering
+    const searchInput = document.getElementById('search-input');
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const releaseRows = document.querySelectorAll('.release-row');
+    const emptyState = document.getElementById('empty-state');
+
+    let currentCategory = 'all';
+
+    function filterTable() {
+      const query = searchInput.value.toLowerCase().trim();
+      let visibleCount = 0;
+
+      releaseRows.forEach(row => {
+        const category = row.getAttribute('data-category');
+        const textContent = row.textContent.toLowerCase();
+
+        const matchesCategory = (currentCategory === 'all' || category === currentCategory);
+        const matchesQuery = (textContent.includes(query));
+
+        if (matchesCategory && matchesQuery) {
+          row.style.display = 'table-row';
+          visibleCount++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+
+      emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+
+    searchInput.addEventListener('input', filterTable);
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentCategory = btn.getAttribute('data-filter');
+        filterTable();
+      });
+    });
+
+    // Simulated Download Modal Logic
+    const downloadTriggers = document.querySelectorAll('.download-trigger');
+    const modal = document.getElementById('download-modal');
+    const modalClose = document.getElementById('modal-close');
+    const modalTitle = document.getElementById('modal-title');
+    const modalFilename = document.getElementById('modal-filename');
+    const progressBar = document.getElementById('progress-bar');
+    const progressStatus = document.getElementById('progress-status');
+
+    downloadTriggers.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const title = btn.getAttribute('data-title');
+        const file = btn.getAttribute('data-file');
+
+        modalTitle.textContent = `Downloading ${title}`;
+        modalFilename.textContent = file;
+        progressBar.style.width = '0%';
+        progressStatus.textContent = 'Initializing release bundle...';
+        modal.classList.add('active');
+
+        let progress = 0;
+        const interval = setInterval(() => {
+          progress += Math.floor(Math.random() * 25) + 10;
+          if (progress >= 100) {
+            progress = 100;
+            progressBar.style.width = '100%';
+            progressStatus.textContent = 'Download started!';
+            clearInterval(interval);
+            setTimeout(() => {
+              modal.classList.remove('active');
+            }, 1200);
+          } else {
+            progressBar.style.width = `${progress}%`;
+            progressStatus.textContent = `Fetching binary... ${progress}%`;
+          }
+        }, 150);
+      });
+    });
+
+    modalClose.addEventListener('click', () => {
+      modal.classList.remove('active');
+    });
+
+    // Canvas Background FX Engine
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    const animSelect = document.getElementById('bg-anim-select');
+
+    let width, height;
+    let animMode = 'nodes';
+    let animationFrameId;
+
+    function resizeCanvas() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // FX 1: Constellation Nodes
+    const nodes = Array.from({ length: 45 }, () => ({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      vx: (Math.random() - 0.5) * 0.6,
+      vy: (Math.random() - 0.5) * 0.6,
+      radius: Math.random() * 2 + 1
+    }));
+
+    function renderNodes() {
+      ctx.clearRect(0, 0, width, height);
+      const isDark = htmlEl.getAttribute('data-theme') === 'dark';
+      const color = isDark ? '255, 255, 255' : '0, 0, 0';
+
+      nodes.forEach((node, i) => {
+        node.x += node.vx;
+        node.y += node.vy;
+
+        if (node.x < 0 || node.x > width) node.vx *= -1;
+        if (node.y < 0 || node.y > height) node.vy *= -1;
+
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${color}, 0.3)`;
+        ctx.fill();
+
+        for (let j = i + 1; j < nodes.length; j++) {
+          const other = nodes[j];
+          const dist = Math.hypot(node.x - other.x, node.y - other.value || node.y - other.y);
+          if (dist < 130) {
+            ctx.beginPath();
+            ctx.moveTo(node.x, node.y);
+            ctx.lineTo(other.x, other.y);
+            ctx.strokeStyle = `rgba(${color}, ${0.15 * (1 - dist / 130)})`;
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+          }
+        }
+      });
+    }
+
+    // FX 2: Code Rain
+    const chars = '01QYXEV';
+    const drops = Array.from({ length: Math.floor(window.innerWidth / 20) }, () => Math.random() * -100);
+
+    function renderMatrix() {
+      const isDark = htmlEl.getAttribute('data-theme') === 'dark';
+      ctx.fillStyle = isDark ? 'rgba(0, 0, 0, 0.1)' : 'rgba(244, 245, 247, 0.1)';
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.fillStyle = isDark ? 'rgba(255, 255, 255, 0.35)' : 'rgba(0, 0, 0, 0.35)';
+      ctx.font = '12px Montserrat';
+
+      drops.forEach((y, i) => {
+        const text = chars[Math.floor(Math.random() * chars.length)];
+        const x = i * 20;
+        ctx.fillText(text, x, y);
+
+        if (y > height && Math.random() > 0.975) {
+          drops[i] = 0;
+        } else {
+          drops[i] = y + 15;
+        }
+      });
+    }
+
+    // FX 3: Cyber Mesh Grid
+    let gridOffset = 0;
+    function renderGrid() {
+      ctx.clearRect(0, 0, width, height);
+      const isDark = htmlEl.getAttribute('data-theme') === 'dark';
+      const color = isDark ? '255, 255, 255' : '0, 0, 0';
+
+      gridOffset = (gridOffset + 0.3) % 40;
+      ctx.strokeStyle = `rgba(${color}, 0.05)`;
+      ctx.lineWidth = 1;
+
+      for (let x = 0; x < width; x += 40) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+
+      for (let y = gridOffset; y < height; y += 40) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+    }
+
+    // Main Loop Render
+    function loop() {
+      if (animMode === 'nodes') renderNodes();
+      else if (animMode === 'matrix') renderMatrix();
+      else if (animMode === 'grid') renderGrid();
+      else ctx.clearRect(0, 0, width, height);
+
+      animationFrameId = requestAnimationFrame(loop);
+    }
+
+    animSelect.addEventListener('change', (e) => {
+      animMode = e.target.value;
+      ctx.clearRect(0, 0, width, height);
+    });
+
+    loop();
+  </script>
+</body>
+</html>
